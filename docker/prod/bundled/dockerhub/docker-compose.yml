@@ -4,7 +4,7 @@ services:
     image: "mariadb/server:10.5"
     container_name: seb-server-mariadb
     environment:
-        - MYSQL_ROOT_PASSWORD=${DB_SA_PWD}
+        - MYSQL_ROOT_PASSWORD=1234
     ports:
         - 3306:3306
     volumes:
@@ -26,7 +26,7 @@ services:
         - JAVA_HEAP_MAX=8G
         - spring_profiles_active=gui,ws,prod-ws,prod-gui,prod
         - sebserver_password=${SEBSERVER_PWD}
-        - sebserver_mariadb_password=${DB_SA_PWD}
+        - sebserver_mariadb_password=1234
         
         # Set the below URL component settings from where the the web-service is externally available
         # NOTE: This must be the address from that the service is externally available (not network inernal address)
@@ -73,6 +73,18 @@ networks:
 
 volumes:
   seb-server-config:
-    name: seb-server-config
+    driver: azure_file
+    driver_opts:
+      share_name: config
+      storage_account_name: sebfilestorage
+      storageAccountKey: g153X2C62PwH5rEQQWhpNv7B4CdXyTFkBJ+FEmdGINUA07E23qc5umFFqJDB4a6tflsQn/CtG20fqCrl5Aqt8g==
   seb-server-mariadb:
-    name: seb-server-mariadb
+    driver: azure_file
+    driver_opts:
+      share_name: mariadbconfig
+      storage_account_name: sebfilestorage
+      storageAccountKey: g153X2C62PwH5rEQQWhpNv7B4CdXyTFkBJ+FEmdGINUA07E23qc5umFFqJDB4a6tflsQn/CtG20fqCrl5Aqt8g==
+  # seb-server-config:
+  #   name: seb-server-config
+  # seb-server-mariadb:
+  #   name: seb-server-mariadb
