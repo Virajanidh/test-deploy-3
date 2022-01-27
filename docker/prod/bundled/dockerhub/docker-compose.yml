@@ -4,7 +4,7 @@ services:
     image: "mariadb/server:10.5"
     container_name: seb-server-mariadb
     environment:
-        - MYSQL_ROOT_PASSWORD=1234
+        - MYSQL_ROOT_PASSWORD=${DB_SA_PWD}
     ports:
         - 3306:3306
     volumes:
@@ -26,12 +26,12 @@ services:
         - JAVA_HEAP_MAX=8G
         - spring_profiles_active=gui,ws,prod-ws,prod-gui,prod
         - sebserver_password=${SEBSERVER_PWD}
-        - sebserver_mariadb_password=1234
+        - sebserver_mariadb_password=${DB_SA_PWD}
         
         # Set the below URL component settings from where the the web-service is externally available
         # NOTE: This must be the address from that the service is externally available (not network inernal address)
         - sebserver_webservice_http_external_scheme=https
-        - sebserver_webservice_http_external_servername=
+        - sebserver_webservice_http_external_servername=oat-seb.eastus.cloudapp.azure.com
         - sebserver_webservice_http_external_port=
         
         # JMX settings
@@ -52,20 +52,20 @@ services:
           - "mariadb"
       restart: unless-stopped
 
-  reverse-proxy:
-    image: "nginx:latest"
-    container_name: seb-server-proxy
-    volumes:
-      - ./config/nginx:/etc/nginx/conf.d
-      - ./config/nginx/certs:/sebserver/config/certs
-    ports:
-      - 443:443
-    networks:
-      - seb-server-network
-    depends_on:
-      - "mariadb"
-      - "seb-server"
-    restart: unless-stopped
+  # reverse-proxy:
+  #   image: "nginx:latest"
+  #   container_name: seb-server-proxy
+  #   volumes:
+  #     - ./config/nginx:/etc/nginx/conf.d
+  #     - ./config/nginx/certs:/sebserver/config/certs
+  #   ports:
+  #     - 443:443
+  #   networks:
+  #     - seb-server-network
+  #   depends_on:
+  #     - "mariadb"
+  #     - "seb-server"
+  #   restart: unless-stopped
 
 networks:
   seb-server-network:
@@ -73,18 +73,6 @@ networks:
 
 volumes:
   seb-server-config:
-    driver: azure_file
-    driver_opts:
-      share_name: config
-      storage_account_name: sebfilestorage
-      storageAccountKey: g153X2C62PwH5rEQQWhpNv7B4CdXyTFkBJ+FEmdGINUA07E23qc5umFFqJDB4a6tflsQn/CtG20fqCrl5Aqt8g==
+    name: seb-server-config
   seb-server-mariadb:
-    driver: azure_file
-    driver_opts:
-      share_name: mariadbconfig
-      storage_account_name: sebfilestorage
-      storageAccountKey: g153X2C62PwH5rEQQWhpNv7B4CdXyTFkBJ+FEmdGINUA07E23qc5umFFqJDB4a6tflsQn/CtG20fqCrl5Aqt8g==
-  # seb-server-config:
-  #   name: seb-server-config
-  # seb-server-mariadb:
-  #   name: seb-server-mariadb
+    name: seb-server-mariadb
