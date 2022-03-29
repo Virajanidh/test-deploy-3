@@ -4,9 +4,8 @@ ARG SEBSERVER_VERSION
 ARG GIT_TAG="v${SEBSERVER_VERSION}"
 
 WORKDIR /sebserver
-RUN if [ "x${GIT_TAG}" = "x" ] ; \
-    then git clone --depth 1 https://github.com/SafeExamBrowser/seb-server.git ; \
-    else git clone -b "$GIT_TAG" --depth 1 https://github.com/SafeExamBrowser/seb-server.git ; fi
+RUN mkdir seb-server
+COPY ./SEB-Server /sebserver/seb-server
 WORKDIR /sebserver/seb-server/
 RUN git rev-parse --short HEAD > commit_hash
 
